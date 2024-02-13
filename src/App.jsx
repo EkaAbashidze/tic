@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Square from "./components/Square";
 import Entrygame from "./components/Entrygame";
 import Winneralarm from "./components/Winneralarm";
-import Computermove from "./components/Comutermove";
+// import Computermove from "./components/Comutermove";
 import xImg from "../public/assets/Combined Shape Copy 2.png";
 import zeroImg from "../public/assets/Oval Copy.png";
 import smallX from "../public/assets/SmallX.png";
@@ -25,6 +25,19 @@ function App() {
   const [winnerX, setWinnerX] = useState(false);
   const [winnerO, setWinnerO] = useState(false);
   const [tieAlarm, setTieAlarm] = useState(false);
+  const [against, setAgainst] = useState("");
+
+  const calculateCPUMove = () => {
+    const availableSquares = squares.reduce((acc, curr, index) => {
+      if (curr === null) {
+        acc.push(index);
+      }
+      return acc;
+    }, []);
+
+    const randomIndex = Math.floor(Math.random() * availableSquares.length);
+    return availableSquares[randomIndex];
+  };
 
   const handleClick = (i) => {
     if (winner || squares[i]) {
@@ -40,35 +53,38 @@ function App() {
 
     const winnerFound = defineWinner(nextSquares);
     if (winnerFound) {
-      setWinner(playerX === "P1" ? "PLAYER 1 WINS!" : "PLAYER 2 WINS!");
-    } // X როცა არის არჩეული player1-ად რატომ არენდერებს "PLAYER 1 WINS!"?
-    if (winnerFound === "X") {
-      setCountX(countX + 1);
-      setWinnerX(true);
-      setWinnerO(false);
-      setTieAlarm(false);
-    } else if (winnerFound === "O") {
-      setCountO(countO + 1);
-      setWinnerO(true);
-      setWinnerX(false);
-      setTieAlarm(false);
-    } else if (!winnerFound && nextSquares.every((square) => square !== null)) {
-      // Check for a tie only when all squares are filled and there is no winner
-      setTies(ties + 1);
-      setWinner("TIE"); // You can use any value to represent a tie in the state
-      setTieAlarm(true);
-      setWinnerX(false);
-      setWinnerO(false);
+      setWinner(playerX === "(P1)" ? "PLAYER 1 WINS!" : "PLAYER 2 WINS!");
+      if (winnerFound === "X") {
+        setCountX(countX + 1);
+        setWinnerX(true);
+        setWinnerO(false);
+        setTieAlarm(false);
+      } else if (winnerFound === "O") {
+        setCountO(countO + 1);
+        setWinnerO(true);
+        setWinnerX(false);
+        setTieAlarm(false);
+      } else if (
+        !winnerFound &&
+        nextSquares.every((square) => square !== null)
+      ) {
+        setTies(ties + 1);
+        setWinner("TIE");
+        setTieAlarm(true);
+        setWinnerX(false);
+        setWinnerO(false);
+      }
+      if (winnerFound === "X" && playerX === "(P1)") {
+        setWinner("PLAYER 1 WINS!");
+      } else if (winnerFound === "X" && playerX === "(P2)") {
+        setWinner("PLAYER 2 WINS!");
+      } else if (winnerFound === "O" && playerO === "(P1)") {
+        setWinner("PLAYER 1 WINS!");
+      } else if (winnerFound === "O" && playerO === "(P2)") {
+        setWinner("PLAYER 2 WINS!");
+      }
     }
-    if (winnerFound === "X" && playerX === "(P1)") {
-      setWinner("PLAYER 1 WINS!");
-    } else if (winnerFound === "X" && playerX === "(P2)") {
-      setWinner("PLAYER 2 WINS!");
-    } else if (winnerFound === "O" && playerO === "(P1)") {
-      setWinner("PLAYER 1 WINS!");
-    } else if (winnerFound === "O" && playerO === "(P2)") {
-      setWinner("PLAYER 2 WINS!");
-    } // it doesn't work:(
+
     setTurn(
       xIsNext ? (
         <img className="w-[16px] h-[16px]" src={smallZero} alt="x" />
@@ -103,6 +119,7 @@ function App() {
 
     return null;
   }
+
   function resetGame() {
     setSquares(Array(9).fill(null));
     setXIsNext(true);
@@ -120,9 +137,22 @@ function App() {
     resetGame();
     setStart(true);
   };
+
   const quitHandle = () => {
     window.location.reload();
   };
+
+  useEffect(() => {
+    const makeCPUMove = () => {
+      handleClick(calculateCPUMove());
+    };
+
+    if (against === "cpu" && !xIsNext && !winner) {
+      const timeoutId = setTimeout(makeCPUMove, 500);
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [xIsNext, against, winner]);
 
   return (
     <>
@@ -137,6 +167,8 @@ function App() {
         zeroImg={zeroImg}
         smallX={smallX}
         smallZero={smallZero}
+        against={against}
+        setAgainst={setAgainst}
       />
       <div
         className={` ${
@@ -248,23 +280,6 @@ function App() {
           zeroImg={zeroImg}
         />
       </div>
-      {xIsNext && !winner && (
-        <Computermove
-          squares={squares}
-          setSquares={setSquares}
-          setXIsNext={setXIsNext}
-          setTurn={setTurn}
-          defineWinner={defineWinner}
-          winner={winner}
-          setWinner={setWinner}
-          countX={countX}
-          setCountX={setCountX}
-          countO={countO}
-          setCountO={setCountO}
-          ties={ties}
-          setTies={setTies}
-        />
-      )}
     </>
   );
 }

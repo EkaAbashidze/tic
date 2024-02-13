@@ -15,10 +15,20 @@ export default function Entrygame({
   zeroImg,
   smallX,
   smallZero,
+  against,
+  setAgainst,
 }) {
+  const handleCpuStart = () => {
+    setStart(!start);
+    setPlayerX("(P1)");
+    setPlayerO(playerX === "(P1)" ? "(CPU)" : "(P1)");
+    setAgainst("cpu");
+  };
+
   const handleGameStart = () => {
     setStart(!start);
   };
+
   const handlePlayerXStart = () => {
     setPlayerX("(P1)");
     setPlayerO("(P2)");
@@ -27,6 +37,7 @@ export default function Entrygame({
     setPlayerX("(P2)");
     setPlayerO("(P1)");
   };
+
   return (
     <div
       className={` ${
@@ -69,7 +80,10 @@ export default function Entrygame({
         </span>
       </div>
 
-      <button onClick={handleGameStart}  className=" flex w-[327px] h-[56px] bg-[#F2B137] hover:bg-[#FFC860] cursor-pointer rounded-[10px] mt-[30px] justify-center items-center">
+      <button
+        onClick={handleCpuStart}
+        className=" flex w-[327px] h-[56px] bg-[#F2B137] hover:bg-[#FFC860] cursor-pointer rounded-[10px] mt-[30px] justify-center items-center"
+      >
         {" "}
         <span className=" font-bold">NEW GAME (VS CPU)</span>
       </button>
