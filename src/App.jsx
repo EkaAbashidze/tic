@@ -3,11 +3,11 @@ import Square from "./components/Square";
 import Entrygame from "./components/Entrygame";
 import Winneralarm from "./components/Winneralarm";
 // import Computermove from "./components/Comutermove";
-import xImg from "../public/assets/Combined Shape Copy 2.png";
-import zeroImg from "../public/assets/Oval Copy.png";
-import smallX from "../public/assets/SmallX.png";
-import smallZero from "../public/assets/Oval.png";
-import Rotate from "../public/assets/Rotate.png";
+import xImg from "/assets/Combined Shape Copy 2.png";
+import zeroImg from "/assets/Oval Copy.png";
+import smallX from "/assets/SmallX.png";
+import smallZero from "/assets/Oval.png";
+import Rotate from "/assets/Rotate.png";
 
 function App() {
   const [squares, setSquares] = useState(Array(9).fill(null));
